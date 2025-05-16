@@ -1,6 +1,6 @@
 ﻿namespace SiteApi.Models
 {
-    public class SchoolModel
+    public class School
     {
         public int Id { get; set; }
         public string Name { get; set; }

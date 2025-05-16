@@ -4,7 +4,7 @@ using SiteApi.Models;
 
 namespace SiteApi.Data
 {
-    public class ApiDbContext: IdentityDbContext<UserModel>
+    public class ApiDbContext: IdentityDbContext<User>
     {
         public ApiDbContext(DbContextOptions<ApiDbContext> options)
             : base(options)
@@ -12,12 +12,12 @@ namespace SiteApi.Data
             
         }
 
-        public DbSet<LogoModel> Logos { get; set; }
-        public DbSet<SlideModel> Slides { get; set; }
-        public DbSet<VideoModel> Videos { get; set; }
-        public DbSet<SchoolModel> Schools { get; set; }
-        public DbSet<CourseModel> Courses { get; set; }
-        public DbSet<AssessmentModel> Assessments { get; set; }
+        public DbSet<Logo> Logos { get; set; }
+        public DbSet<Slide> Slides { get; set; }
+        public DbSet<Video> Videos { get; set; }
+        public DbSet<School> Schools { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<Assessment> Assessments { get; set; }
 
     }
 }

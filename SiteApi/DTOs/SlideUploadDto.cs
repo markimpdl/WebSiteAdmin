@@ -1,9 +1,8 @@
-﻿namespace SiteApi.Models
+﻿namespace SiteApi.DTOs
 {
-    public class SlideModel
+    public class SlideUploadDto
     {
-        public int Id { get; set; }
-        public string ImageUrl { get; set; }   
+        public IFormFile Image { get; set; }
         public string Title { get; set; }
         public string ButtonText { get; set; }
         public string ButtonLink { get; set; }

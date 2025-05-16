@@ -1,8 +1,8 @@
 ﻿namespace SiteApi.Models
 {
-    public class LogoModel
+    public class Video
     {
         public int Id { get; set; }
-        public string ImageUrl { get; set; }
+        public string Url { get; set; }
     }
 }
