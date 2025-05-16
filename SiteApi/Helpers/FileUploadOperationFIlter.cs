@@ -1,17 +1,28 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 
 public class FileUploadOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        var param = context.MethodInfo.GetParameters()
+        // Busca o primeiro parâmetro que é um DTO com propriedades
+        var dtoParam = context.MethodInfo
+            .GetParameters()
             .FirstOrDefault(p => p.ParameterType.GetProperties().Any());
 
-        if (param == null) return;
+        if (dtoParam == null)
+            return;
+
+        // Verifica se há pelo menos um IFormFile
+        var hasFile = dtoParam.ParameterType
+            .GetProperties()
+            .Any(p => p.PropertyType == typeof(IFormFile));
+
+        if (!hasFile)
+            return; // se não tem arquivo, não aplica multipart/form-data
 
         var schema = new OpenApiSchema
         {
@@ -19,7 +30,7 @@ public class FileUploadOperationFilter : IOperationFilter
             Properties = { }
         };
 
-        foreach (var prop in param.ParameterType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        foreach (var prop in dtoParam.ParameterType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             var isFile = prop.PropertyType == typeof(IFormFile);
 
