@@ -14,6 +14,7 @@ public class AdminController : ControllerBase
     private readonly IGenericService<Course> _courseService;
     private readonly IGenericService<School> _schoolService;
     private readonly IGenericService<Logo> _logoService;
+    private readonly IGenericService<Video> _videoService;
     private readonly IImageUploadService _imageUploadService;
 
     public AdminController(
@@ -21,12 +22,14 @@ public class AdminController : ControllerBase
         IGenericService<Course> courseService,
         IGenericService<School> schoolService,
         IGenericService<Logo> logoService,
+        IGenericService<Video> videoService,
         IImageUploadService imageUploadService)
     {
         _slideService = slideService;
         _courseService = courseService;
         _schoolService = schoolService;
         _logoService = logoService;
+        _videoService = videoService;
         _imageUploadService = imageUploadService;
     }
 
@@ -66,6 +69,21 @@ public class AdminController : ControllerBase
             slide.ButtonLink = dto.ButtonLink;
 
         await _slideService.UpdateAsync(slide);
+        return Ok(slide);
+    }
+
+    [HttpGet("slide")]
+    public async Task<IActionResult> GetSlides()
+    {
+        var result = await _slideService.GetAllAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("slide/{id}")]
+    public async Task<IActionResult> GetSlideById(int id)
+    {
+        var slide = await _slideService.GetByIdAsync(id);
+        if (slide == null) return NotFound();
         return Ok(slide);
     }
 
@@ -123,6 +141,21 @@ public class AdminController : ControllerBase
         return Ok(course);
     }
 
+    [HttpGet("course")]
+    public async Task<IActionResult> GetCourses()
+    {
+        var result = await _courseService.GetAllAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("course/{id}")]
+    public async Task<IActionResult> GetCourseById(int id)
+    {
+        var course = await _courseService.GetByIdAsync(id);
+        if (course == null) return NotFound();
+        return Ok(course);
+    }
+
 
     [HttpDelete("course/{id}")]
     public async Task<IActionResult> DeleteCourse(int id)
@@ -177,6 +210,20 @@ public class AdminController : ControllerBase
         return Ok(school);
     }
 
+    [HttpGet("school")]
+    public async Task<IActionResult> GetSchools()
+    {
+        var result = await _schoolService.GetAllAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("school/{id}")]
+    public async Task<IActionResult> GetSchoolById(int id)
+    {
+        var school = await _schoolService.GetByIdAsync(id);
+        if (school == null) return NotFound();
+        return Ok(school);
+    }
 
     [HttpDelete("school/{id}")]
     public async Task<IActionResult> DeleteSchool(int id)
@@ -188,23 +235,62 @@ public class AdminController : ControllerBase
     [HttpPost("logo")]
     public async Task<IActionResult> SetLogo([FromForm] LogoUploadDto dto)
     {
+        var logos = await _logoService.GetAllAsync();
+        var existing = logos.FirstOrDefault();
+
         var imageUrl = await _imageUploadService.UploadImageAsync(dto.Image);
-        var logo = new Logo { ImageUrl = imageUrl };
-        await _logoService.AddAsync(logo);
+
+        if (existing != null)
+        {
+            existing.ImageUrl = imageUrl;
+            await _logoService.UpdateAsync(existing);
+            return Ok(existing);
+        }
+
+        var newLogo = new Logo { ImageUrl = imageUrl };
+        await _logoService.AddAsync(newLogo);
+        return Ok(newLogo);
+    }
+
+    [HttpGet("logo")]
+    public async Task<IActionResult> GetLogo()
+    {
+        var logo = (await _logoService.GetAllAsync()).FirstOrDefault();
+        if (logo == null) return NotFound();
         return Ok(logo);
     }
 
-    [HttpPatch("logo/{id}")]
-    public async Task<IActionResult> PatchLogo(int id, [FromForm] LogoUploadDto dto)
+    [HttpPost("video")]
+    public async Task<IActionResult> SetVideo([FromBody] VideoDto dto)
     {
-        var logo = await _logoService.GetByIdAsync(id);
-        if (logo == null) return NotFound();
+        var videos = await _videoService.GetAllAsync();
+        var existing = videos.FirstOrDefault();
 
-        if (dto.Image != null)
-            logo.ImageUrl = await _imageUploadService.UploadImageAsync(dto.Image);
+        if (existing != null)
+        {
+            existing.Url = dto.Url;
+            await _videoService.UpdateAsync(existing);
+            return Ok(existing);
+        }
 
-        await _logoService.UpdateAsync(logo);
-        return Ok(logo);
+        var newVideo = new Video { Url = dto.Url };
+        await _videoService.AddAsync(newVideo);
+        return Ok(newVideo);
+    }
+
+    [HttpGet("video")]
+    public async Task<IActionResult> GetVideo()
+    {
+        var video = (await _videoService.GetAllAsync()).FirstOrDefault();
+        if (video == null) return NotFound();
+        return Ok(video);
+    }
+
+    [HttpDelete("video/{id}")]
+    public async Task<IActionResult> DeleteVideo(int id)
+    {
+        await _videoService.DeleteAsync(id);
+        return Ok();
     }
 
 
