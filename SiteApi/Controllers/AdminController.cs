@@ -47,20 +47,28 @@ public class AdminController : ControllerBase
         return Ok(slide);
     }
 
-    [HttpPut("slide/{id}")]
-    public async Task<IActionResult> UpdateSlide(int id, [FromForm] SlideUploadDto dto)
+    [HttpPatch("slide/{id}")]
+    public async Task<IActionResult> PatchSlide(int id, [FromForm] SlideUploadDto dto)
     {
         var slide = await _slideService.GetByIdAsync(id);
         if (slide == null) return NotFound();
 
-        slide.ImageUrl = await _imageUploadService.UploadImageAsync(dto.Image);
-        slide.Title = dto.Title;
-        slide.ButtonText = dto.ButtonText;
-        slide.ButtonLink = dto.ButtonLink;
+        if (dto.Image != null)
+            slide.ImageUrl = await _imageUploadService.UploadImageAsync(dto.Image);
+
+        if (!string.IsNullOrWhiteSpace(dto.Title))
+            slide.Title = dto.Title;
+
+        if (!string.IsNullOrWhiteSpace(dto.ButtonText))
+            slide.ButtonText = dto.ButtonText;
+
+        if (!string.IsNullOrWhiteSpace(dto.ButtonLink))
+            slide.ButtonLink = dto.ButtonLink;
 
         await _slideService.UpdateAsync(slide);
         return Ok(slide);
     }
+
 
     [HttpDelete("slide/{id}")]
     public async Task<IActionResult> DeleteSlide(int id)
@@ -86,22 +94,35 @@ public class AdminController : ControllerBase
         return Ok(course);
     }
 
-    [HttpPut("course/{id}")]
-    public async Task<IActionResult> UpdateCourse(int id, [FromForm] CourseUploadDto dto)
+    [HttpPatch("course/{id}")]
+    public async Task<IActionResult> PatchCourse(int id, [FromForm] CourseUploadDto dto)
     {
         var course = await _courseService.GetByIdAsync(id);
         if (course == null) return NotFound();
 
-        course.Name = dto.Name;
-        course.Description = dto.Description;
-        course.Image1 = await _imageUploadService.UploadImageAsync(dto.Image1);
-        course.Image2 = await _imageUploadService.UploadImageAsync(dto.Image2);
-        course.Image3 = await _imageUploadService.UploadImageAsync(dto.Image3);
-        course.Image4 = await _imageUploadService.UploadImageAsync(dto.Image4);
+        // Só atualiza se não for nulo
+        if (!string.IsNullOrWhiteSpace(dto.Name))
+            course.Name = dto.Name;
+
+        if (!string.IsNullOrWhiteSpace(dto.Description))
+            course.Description = dto.Description;
+
+        if (dto.Image1 != null)
+            course.Image1 = await _imageUploadService.UploadImageAsync(dto.Image1);
+
+        if (dto.Image2 != null)
+            course.Image2 = await _imageUploadService.UploadImageAsync(dto.Image2);
+
+        if (dto.Image3 != null)
+            course.Image3 = await _imageUploadService.UploadImageAsync(dto.Image3);
+
+        if (dto.Image4 != null)
+            course.Image4 = await _imageUploadService.UploadImageAsync(dto.Image4);
 
         await _courseService.UpdateAsync(course);
         return Ok(course);
     }
+
 
     [HttpDelete("course/{id}")]
     public async Task<IActionResult> DeleteCourse(int id)
@@ -128,22 +149,34 @@ public class AdminController : ControllerBase
         return Ok(school);
     }
 
-    [HttpPut("school/{id}")]
-    public async Task<IActionResult> UpdateSchool(int id, [FromForm] SchoolUploadDto dto)
+    [HttpPatch("school/{id}")]
+    public async Task<IActionResult> PatchSchool(int id, [FromForm] SchoolUploadDto dto)
     {
         var school = await _schoolService.GetByIdAsync(id);
         if (school == null) return NotFound();
 
-        school.Name = dto.Name;
-        school.Phone = dto.Phone;
-        school.Email = dto.Email;
-        school.Coordinates = dto.Coordinates;
-        school.Address = dto.Address;
-        school.ImageUrl = await _imageUploadService.UploadImageAsync(dto.Image);
+        if (!string.IsNullOrWhiteSpace(dto.Name))
+            school.Name = dto.Name;
+
+        if (!string.IsNullOrWhiteSpace(dto.Phone))
+            school.Phone = dto.Phone;
+
+        if (!string.IsNullOrWhiteSpace(dto.Email))
+            school.Email = dto.Email;
+
+        if (!string.IsNullOrWhiteSpace(dto.Coordinates))
+            school.Coordinates = dto.Coordinates;
+
+        if (!string.IsNullOrWhiteSpace(dto.Address))
+            school.Address = dto.Address;
+
+        if (dto.Image != null)
+            school.ImageUrl = await _imageUploadService.UploadImageAsync(dto.Image);
 
         await _schoolService.UpdateAsync(school);
         return Ok(school);
     }
+
 
     [HttpDelete("school/{id}")]
     public async Task<IActionResult> DeleteSchool(int id)
@@ -161,14 +194,18 @@ public class AdminController : ControllerBase
         return Ok(logo);
     }
 
-    [HttpPut("logo/{id}")]
-    public async Task<IActionResult> UpdateLogo(int id, [FromForm] LogoUploadDto dto)
+    [HttpPatch("logo/{id}")]
+    public async Task<IActionResult> PatchLogo(int id, [FromForm] LogoUploadDto dto)
     {
         var logo = await _logoService.GetByIdAsync(id);
         if (logo == null) return NotFound();
-        logo.ImageUrl = await _imageUploadService.UploadImageAsync(dto.Image);
+
+        if (dto.Image != null)
+            logo.ImageUrl = await _imageUploadService.UploadImageAsync(dto.Image);
+
         await _logoService.UpdateAsync(logo);
         return Ok(logo);
     }
-    
+
+
 }
