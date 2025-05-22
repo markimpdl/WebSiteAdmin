@@ -13,6 +13,9 @@ using SiteApi.Repositories;
 using SiteApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+//builder.WebHost.UseUrls("http://0.0.0.0:8080");
+builder.Services.AddCors();
+
 //Postgres Configuration
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddDbContext<ApiDbContext>(options =>
@@ -110,15 +113,24 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+    dbContext.Database.Migrate(); // Aplica as migrations automaticamente
 }
 
-app.UseHttpsRedirection();
+
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+
+//app.UseHttpsRedirection();
+app.UseCors(policy =>
+    policy.AllowAnyOrigin()
+          .AllowAnyMethod()
+          .AllowAnyHeader()
+);
 app.UseAuthentication(); 
 app.UseAuthorization();
 
